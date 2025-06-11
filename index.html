@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ITspeack</title>
+  <style type="text/css" media="all">
+    :root {
+      --primary: mediumblue;
+      --secondary: royalblue;
+      --accent: skyblue;
+      --button: #007bff;
+      --button-hover: #0056b3;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--primary);
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .name h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .btn button {
+      margin-left: 10px;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      background-color: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn button:hover {
+      background-color: var(--secondary);
+    }
+
+    .text h1 {
+      color: white;
+      margin-left: 35vw;
+    }
+
+    .text p {
+      color: white;
+      margin-left: 23vw;
+    }
+
+    .img {
+      margin-left: 150px;
+      padding: 20px;
+      border: 2px solid whitesmoke;
+      
+    }
+
+    .button1 {
+      margin: 5px;
+      padding: 9px;
+      background-color: var(--primary);
+      border: 1px solid ghostwhite;
+      color: white;
+      font-weight: bold;
+    }
+
+    .button1:hover {
+      background-color: ghostwhite;
+      color: var(--primary);
+    }
+
+   .typetext{
+     margin-top: 15px;
+     width: 80vw; 
+     height: 50vw;
+     margin-left: 10vw;
+     font-family: 'IBM Plex Sans', 'Inter', 'Helvetica Neue', sans-serif;
+     font-size: 17px;
+   }
+
+    .button2 {
+      margin: 5px;
+      padding: 9px;
+      background-color: var(--primary);
+      border: 1px solid ghostwhite;
+      color: white;
+      font-weight: bold;
+      margin-left: 35vw;
+      width: 200px;
+      height: 40px;
+      margin-top: 15px;
+      font-size: 20px;
+    }
+
+    .button2:hover {
+      background-color: ghostwhite;
+      color: var(--primary);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="head">
+    <div class="name">
+      <h1>ITspeack</h1>
+    </div>
+    <div class="btn">
+      <button type="button">Home</button>
+      <button class="change" type="button">Change</button>
+      <a href="https://github.com/shivamshrma09" target="_blank" style="text-decoration: none;">
+        <button type="button">Github profile</button>
+      </a>
+      <a href="https://www.linkedin.com/in/shivam-kumar-321810324?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" style="text-decoration: none;">
+        <button type="button">LinkedIn profile</button>
+      </a>
+    </div>
+  </div>
+
+  <div class="text">
+    <h1>the ITspeack</h1>
+    <p>Convert image and text to speech to SAVE time</p>
+  </div>
+
+  <br>
+  <hr>
+  <br>
+
+  <div class="inputs">
+    <input type="file" id="img" class="img" accept="image/*" />
+    <button class="button1" onclick="extractText()">Extract Text</button><br>
+    <textarea id="typetext" class="typetext" placeholder="Extracted or typed text will appear here..."></textarea>
+    <button class="button2" onclick="speakText()">Speech</button>
+  </div>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+
+  <script type="text/javascript">
+    const textArea = document.getElementById("typetext");
+    const imageInput = document.getElementById("img");
+
+    function speakText() {
+      const text = textArea.value.trim();
+      if (!text) {
+        alert("Please enter some text or extract it from an image first.");
+        return;
+      }
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+      } else {
+        alert("Your browser does not support the Web Speech API.");
+      }
+    }
+
+    async function extractText() {
+      const file = imageInput.files[0];
+      if (!file) {
+        alert("Please select an image file first.");
+        return;
+      }
+
+      textArea.value = "Extracting text... please wait.";
+      try {
+        const { data: { text } } = await Tesseract.recognize(
+          file,
+          'eng',
+          {
+            logger: m => {
+              if (m.status === 'recognizing') {
+                textArea.value = `Extracting: ${Math.round(m.progress * 100)}%`;
+              }
+            }
+          }
+        );
+        textArea.value = text.trim();
+      } catch (err) {
+        console.error("Error extracting text:", err);
+        alert("Error extracting text: " + err.message);
+        textArea.value = "";
+      }
+    }
+  </script>
+</body>
+
+</html>
